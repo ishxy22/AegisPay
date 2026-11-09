@@ -81,31 +81,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🎨 Single-CSS Styling Architecture
-
-All styling is managed through a single stylesheet:
-[`src/app/globals.css`](src/app/globals.css)
-
-To change the primary color, dark mode palette, or enterprise theme across the entire application, simply adjust the CSS variables in `globals.css`:
-- `--primary`: Electric Blue (`217 100% 50%`)
-- `--sidebar-bg`: Deep Navy (`224 71% 10%`)
-- `--card`: Surface background
-- `--success`, `--warning`, `--destructive`: Semantic status tokens
-
-Every component, card, badge, AG Grid table, and timeline inherits from these exact tokens.
-
----
-
-## 👥 Team Collaboration (Fuzail & Ishita)
-
-See [`COLLABORATION.md`](COLLABORATION.md) for full details on how Fuzail (Backend/AI/APIs) and Ishita (Frontend/UI/Components) collaborate:
-- Fuzail works in the main repository root.
-- Ishita's specialized modules are packaged in `ishita/`.
-- `ishita/` is git-ignored so Fuzail's branch doesn't conflict.
-- Ishita can run `.\ishita\MERGE_SCRIPT.ps1` and commit under her author identity (`--author="Ishita Verma <ishita@actenx.com>"`), creating clean, conflict-free PRs on GitHub!
-
----
-
 ## 📊 Benchmark Demonstration Scenario
 
 A pre-populated benchmark project is loaded by default:
