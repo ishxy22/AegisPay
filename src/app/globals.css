@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   AEGISPAY DESIGN SYSTEM — SINGLE CSS CONFIGURATION SOURCE OF TRUTH
+   Change any CSS variable here, and the entire application responds immediately.
+   ========================================================================== */
+
+:root {
+  /* Brand / Primary Accent (Electric FinTech Blue) */
+  --primary: 217 100% 50%;           /* #0062FF */
+  --primary-hover: 217 100% 42%;     /* #0050D6 */
+  --primary-foreground: 0 0% 100%;   /* #FFFFFF */
+
+  /* Backgrounds & Foregrounds */
+  --background: 210 40% 98%;         /* #F8FAFC - crisp light slate */
+  --foreground: 222 47% 11%;         /* #0F172A - dark navy text */
+
+  /* Cards & Surfaces */
+  --card: 0 0% 100%;                 /* #FFFFFF */
+  --card-foreground: 222 47% 11%;
+  --card-border: 214 32% 91%;        /* #E2E8F0 */
+
+  /* Sidebar (Deep Navy Enterprise Sidebar) */
+  --sidebar-bg: 224 71% 10%;         /* #0B132B */
+  --sidebar-fg: 210 40% 96%;         /* #F1F5F9 */
+  --sidebar-muted: 215 20% 65%;      /* #94A3B8 */
+  --sidebar-border: 222 47% 16%;     /* #1E293B */
+  --sidebar-active: 217 100% 50%;    /* #0062FF */
+
+  /* Muted & Accents */
+  --muted: 210 40% 96%;              /* #F1F5F9 */
+  --muted-foreground: 215 16% 47%;   /* #64748B */
+  --accent: 199 89% 48%;             /* #0EA5E9 - Cyan AI highlight */
+  --accent-foreground: 0 0% 100%;
+
+  /* Status Colors */
+  --success: 142 71% 45%;            /* #10B981 - Verified / Paid */
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;             /* #F59E0B - Pending / Mediation */
+  --warning-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;          /* #EF4444 - Dispute / Failed */
+  --destructive-foreground: 0 0% 100%;
+
+  /* Form Elements & Borders */
+  --border: 214 32% 91%;             /* #E2E8F0 */
+  --input: 214 32% 91%;              /* #E2E8F0 */
+  --ring: 217 100% 50%;              /* #0062FF */
+
+  /* Border Radii */
+  --radius: 0.5rem;                  /* 8px */
+}
+
+.dark {
+  --primary: 217 100% 55%;
+  --primary-hover: 217 100% 62%;
+  --primary-foreground: 0 0% 100%;
+
+  --background: 224 71% 4%;          /* #060913 */
+  --foreground: 210 40% 98%;
+
+  --card: 224 71% 8%;                /* #0C1222 */
+  --card-foreground: 210 40% 98%;
+  --card-border: 222 47% 16%;
+
+  --sidebar-bg: 224 71% 6%;
+  --sidebar-fg: 210 40% 98%;
+  --sidebar-muted: 215 20% 65%;
+  --sidebar-border: 222 47% 14%;
+  --sidebar-active: 217 100% 55%;
+
+  --muted: 222 47% 14%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 199 89% 48%;
+  --accent-foreground: 0 0% 100%;
+
+  --success: 142 71% 45%;
+  --warning: 38 92% 50%;
+  --destructive: 0 84% 60%;
+
+  --border: 222 47% 16%;
+  --input: 222 47% 16%;
+  --ring: 217 100% 55%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  color: hsl(var(--foreground));
+  background-color: hsl(var(--background));
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* ==========================================================================
+   AG GRID CUSTOM THEME OVERRIDES — Matches AegisPay design tokens
+   ========================================================================== */
+.ag-theme-quartz {
+  --ag-font-family: inherit !important;
+  --ag-font-size: 13px !important;
+  --ag-background-color: hsl(var(--card)) !important;
+  --ag-foreground-color: hsl(var(--card-foreground)) !important;
+  --ag-header-background-color: hsl(var(--muted)) !important;
+  --ag-header-foreground-color: hsl(var(--muted-foreground)) !important;
+  --ag-border-color: hsl(var(--border)) !important;
+  --ag-row-hover-color: hsl(var(--muted) / 0.6) !important;
+  --ag-selected-row-background-color: hsl(var(--primary) / 0.08) !important;
+  --ag-range-selection-border-color: hsl(var(--primary)) !important;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid hsl(var(--border));
+}
