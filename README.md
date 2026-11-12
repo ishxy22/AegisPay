@@ -85,19 +85,19 @@ flowchart TD
 ## ⚡ Quick Start & Demonstration
 
 ### 1. Run the Interactive 17-Step Benchmark Runner
-Visit [`/demo`](http://localhost:3000/demo) in the application.
+Visit [`/demo`](https://aegis-pay-bice.vercel.app/demo) in the application.
 - Click **"▶ Run Full 17-Step Benchmark"** to watch the platform execute the complete lifecycle from Scope Definition to PayPal Capture, Multimodal Inspection, Groq Mediation, and Dossier Generation.
 - Or click **"Run Step"** on any individual milestone to inspect real-time HTTP payloads, API latencies, and cryptographic hashes in the telemetry console.
 
 ### 2. Testing PayPal Sandbox Checkout
-1. Go to any project (e.g. [`/projects/f8bec7cb-d200-4426-8d17-4a00f0c1848b`](http://localhost:3000/projects/f8bec7cb-d200-4426-8d17-4a00f0c1848b)).
+1. Go to any project (e.g. [`/projects/f8bec7cb-d200-4426-8d17-4a00f0c1848b`](https://aegis-pay-bice.vercel.app/projects/f8bec7cb-d200-4426-8d17-4a00f0c1848b)).
 2. Under an unpaid milestone, click **"Pay with PayPal"**.
 3. Choose your checkout mode:
    - **Mode A (Live PayPal Sandbox Modal):** Opens the official PayPal Sandbox popup. Log in with your Sandbox Personal buyer account (`sb-xxxx@personal.example.com`), confirm payment, and click **"Confirm & Capture Payment"**.
    - **Mode B (Instant Benchmark Simulation):** Click **"⚡ Instant Benchmark Simulation"** for zero-login testing during live presentations.
 
 ### 3. Verifying Cryptographic Receipts
-1. Visit [`/verify`](http://localhost:3000/verify).
+1. Visit [`/verify`](https://aegis-pay-bice.vercel.app/verify).
 2. Click **"Load Sample Valid Receipt"** and click **"Run Verification"**.
 3. Edit any single character in the JSON payload (e.g. change `"completion_rate": 100` to `99`) and observe the verification engine immediately reject the payload due to SHA-256 seal mismatch.
 
