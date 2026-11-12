@@ -1,5 +1,5 @@
 # AEGISPAY — TEAM COLLABORATION & MERGE GUIDE
-**Engineered by Fuzail & Ishita (ActenX Solutions)**
+**Engineered by Fuzail Aqdas Khan & Ishita Yadav (ActenX)**
 
 ---
 
