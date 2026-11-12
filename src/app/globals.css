@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* ==========================================================================
    AEGISPAY DESIGN SYSTEM — SINGLE CSS CONFIGURATION SOURCE OF TRUTH
    Change any CSS variable here, and the entire application responds immediately.

@@ -70,8 +70,11 @@ export async function POST(req: NextRequest) {
 
         // Trigger authorized PayPal Sandbox refund for the agreed refund amount
         if (proposal.proposed_refund_amount > 0) {
+          const milestone = await db.getMilestoneById(proposal.milestone_id);
+          const captureIdToRefund = milestone?.paypal_capture_id || 'CAPTURE_SANDBOX_1250_FE';
+
           const refundRes = await refundPayPalCapture({
-            captureId: 'CAPTURE_SANDBOX_1250_FE',
+            captureId: captureIdToRefund,
             amount: proposal.proposed_refund_amount,
             currency: proposal.currency,
             noteToPayer: `AegisPay Mediation Compromise Agreement for ${proposal.milestone_id}`,

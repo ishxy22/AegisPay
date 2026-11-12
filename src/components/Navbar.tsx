@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ShieldCheck, RefreshCw, Zap, UserCheck, AlertTriangle, LogOut } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
+import { ShieldCheck, RefreshCw, Zap, UserCheck, AlertTriangle, LogOut, Sliders } from 'lucide-react';
 
 interface CurrentUser {
   userId: string;
@@ -14,20 +14,12 @@ interface CurrentUser {
 
 export function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [isResetting, setIsResetting] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(true);
 
-  useEffect(() => {
-    // Health capabilities check
-    fetch('/api/health')
-      .then((r) => r.json())
-      .then((data) => {
-        setIsDemoMode(data.capabilities?.isDemoMode ?? true);
-      })
-      .catch(() => setIsDemoMode(true));
-
-    // Current session check
+  const checkAuth = useCallback(() => {
     fetch('/api/auth/me')
       .then((r) => {
         if (r.ok) return r.json();
@@ -42,6 +34,24 @@ export function Navbar() {
       })
       .catch(() => setCurrentUser(null));
   }, []);
+
+  useEffect(() => {
+    // Health capabilities check
+    fetch('/api/health')
+      .then((r) => r.json())
+      .then((data) => {
+        setIsDemoMode(data.capabilities?.isDemoMode ?? true);
+      })
+      .catch(() => setIsDemoMode(true));
+
+    checkAuth();
+
+    // Listen to custom auth events from login/logout
+    window.addEventListener('aegispay-auth-change', checkAuth);
+    return () => {
+      window.removeEventListener('aegispay-auth-change', checkAuth);
+    };
+  }, [checkAuth, pathname]);
 
   const handleResetDemo = async () => {
     setIsResetting(true);
@@ -59,10 +69,12 @@ export function Navbar() {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
       setCurrentUser(null);
+      window.dispatchEvent(new Event('aegispay-auth-change'));
       router.push('/login');
       router.refresh();
     } catch (err) {
       console.error(err);
+      window.location.href = '/';
     }
   };
 
@@ -113,8 +125,16 @@ export function Navbar() {
           </button>
         </div>
 
-        {/* Right / Role Switcher & Profile */}
-        <div className="flex items-center gap-3">
+        {/* Right / Role Switcher, Settings & Profile */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/settings"
+            title="Settings & API Integrations"
+            className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Sliders className="h-4 w-4" />
+          </Link>
+
           {currentUser ? (
             <div className="flex items-center gap-2.5">
               <div className="hidden sm:flex flex-col text-right">

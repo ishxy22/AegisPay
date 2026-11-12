@@ -128,7 +128,7 @@ export default function DashboardPage() {
             </p>
           </div>
           <Link
-            href="/projects/proj_web_dev_3000/milestones"
+            href={projects[0]?.id ? `/projects/${projects[0].id}/milestones` : '/projects/proj_web_dev_3000/milestones'}
             className="text-xs text-primary font-semibold hover:underline"
           >
             Manage Milestones →

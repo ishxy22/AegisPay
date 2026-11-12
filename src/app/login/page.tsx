@@ -33,6 +33,7 @@ function LoginFormInner() {
         throw new Error(data.error || 'Invalid credentials');
       }
 
+      window.dispatchEvent(new Event('aegispay-auth-change'));
       router.push(redirectPath);
       router.refresh();
     } catch (err: any) {

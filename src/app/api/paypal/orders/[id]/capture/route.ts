@@ -6,9 +6,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const { id: orderId } = await params;
     const body = await req.json().catch(() => ({}));
-    const { milestoneId } = body;
+    const { milestoneId, simulate } = body;
 
-    const capture = await capturePayPalOrder(orderId);
+    const capture = await capturePayPalOrder(orderId, { allowSimulation: Boolean(simulate) });
 
     if (milestoneId) {
       await db.updateMilestone(milestoneId, {
@@ -22,6 +22,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       capture,
     });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    const isUnapproved = err.message?.includes('ORDER_NOT_APPROVED') || err.message?.includes('Ensure buyer completes');
+    return NextResponse.json(
+      { error: err.message, requiresApproval: isUnapproved },
+      { status: isUnapproved ? 422 : 500 }
+    );
   }
 }

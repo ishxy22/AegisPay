@@ -107,8 +107,20 @@ export const db = {
 
       if (!error && data) return data as Project;
       if (error) console.error('[DB] getProjectById error:', error.message);
+
+      // If id is 'proj_web_dev_3000' and database uses UUID, resolve to first active project
+      if (id === 'proj_web_dev_3000' || id === 'default') {
+        const { data: firstProj } = await supabase.from('projects').select('*').limit(1).maybeSingle();
+        if (firstProj) return firstProj as Project;
+      }
     }
-    return globalStore.projects.find((p) => p.id === id) || null;
+    const found = globalStore.projects.find((p) => p.id === id);
+    if (found) return found;
+
+    if (id === 'proj_web_dev_3000' || id === 'default') {
+      return globalStore.projects[0] || null;
+    }
+    return null;
   },
 
   async createProject(project: Partial<Project>): Promise<Project> {
@@ -186,10 +198,30 @@ export const db = {
         .eq('project_id', projectId)
         .order('created_at', { ascending: true });
 
-      if (!error && data) return data as Milestone[];
+      if (!error && data && data.length > 0) return data as Milestone[];
       if (error) console.error('[DB] getMilestonesByProject error:', error.message);
+
+      // If projectId is 'proj_web_dev_3000' and database uses UUID, resolve to first project's milestones
+      if (projectId === 'proj_web_dev_3000' || projectId === 'default') {
+        const { data: firstProj } = await supabase.from('projects').select('id').limit(1).maybeSingle();
+        if (firstProj?.id) {
+          const { data: mData } = await supabase
+            .from('milestones')
+            .select('*')
+            .eq('project_id', firstProj.id)
+            .order('created_at', { ascending: true });
+          if (mData && mData.length > 0) return mData as Milestone[];
+        }
+      }
     }
-    return globalStore.milestones.filter((m) => m.project_id === projectId);
+
+    const list = globalStore.milestones.filter((m) => m.project_id === projectId);
+    if (list.length > 0) return list;
+
+    if (projectId === 'proj_web_dev_3000' && globalStore.milestones.length > 0) {
+      return globalStore.milestones;
+    }
+    return [];
   },
 
   async getMilestoneById(id: string): Promise<Milestone | null> {
@@ -567,7 +599,44 @@ export const db = {
     return globalStore.activityLogs;
   },
 
-  resetDemoScenario() {
+  async resetDemoScenario() {
     globalStore.resetDemo();
+
+    if (supabase) {
+      try {
+        // Reset all milestones back to draft and clear payment IDs
+        await supabase
+          .from('milestones')
+          .update({
+            status: 'draft',
+            paypal_order_id: null,
+            paypal_capture_id: null,
+          })
+          .neq('id', '');
+
+        // Reset dispute back to evidence_required
+        await supabase
+          .from('disputes')
+          .update({
+            status: 'evidence_required',
+            evidence_submitted_at: null,
+            paypal_response_notes: null,
+          })
+          .neq('id', '');
+
+        // Reset mediation proposals back to proposed
+        await supabase
+          .from('mediation_proposals')
+          .update({
+            overall_status: 'proposed',
+            client_status: 'pending',
+            provider_status: 'pending',
+            paypal_refund_id: null,
+          })
+          .neq('id', '');
+      } catch (err) {
+        console.error('[DB] Postgres resetDemoScenario error:', err);
+      }
+    }
   },
 };

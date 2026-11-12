@@ -179,7 +179,10 @@ export async function createPayPalOrder(params: {
 /**
  * Capture an approved PayPal order.
  */
-export async function capturePayPalOrder(orderId: string): Promise<PayPalCaptureResponse> {
+export async function capturePayPalOrder(
+  orderId: string,
+  options?: { allowSimulation?: boolean }
+): Promise<PayPalCaptureResponse> {
   const token = await getPayPalAccessToken();
 
   if (token && !orderId.startsWith('PAYPAL_ORDER_')) {
@@ -202,9 +205,19 @@ export async function capturePayPalOrder(orderId: string): Promise<PayPalCapture
         isSimulated: false,
       };
     }
+
+    const errData = await res.json().catch(() => ({}));
+    const errIssue = errData.details?.[0]?.issue || errData.message || res.statusText;
+    
+    // If simulation is NOT explicitly requested, truthfully return the PayPal failure
+    if (!options?.allowSimulation) {
+      throw new Error(`PayPal Capture Rejected: ${errIssue} (${res.status}). Ensure buyer completes authorization in PayPal window before capturing.`);
+    }
+
+    console.warn('[PayPal API] Capture returned non-200, simulation explicitly allowed:', res.status, errIssue);
   }
 
-  // Simulated capture response
+  // Simulated capture response (Only when PayPal credentials missing or simulation explicitly permitted)
   return {
     id: `CAPTURE_${orderId}`,
     status: 'COMPLETED',
