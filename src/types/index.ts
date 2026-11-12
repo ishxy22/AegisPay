@@ -79,6 +79,8 @@ export interface Milestone {
   paypal_invoice_id?: string;
   verified_at?: string;
   proof_receipt_id?: string;
+  assignee_email?: string;
+  assignee_name?: string;
   created_at: string;
   updated_at: string;
 }

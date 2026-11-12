@@ -9,7 +9,9 @@ export async function GET() {
 
   if (session && session.role !== 'admin') {
     const userProjects = allProjects.filter((p) => canUserAccessProject(p, session));
-    return NextResponse.json(userProjects);
+    if (userProjects.length > 0) {
+      return NextResponse.json(userProjects);
+    }
   }
 
   return NextResponse.json(allProjects);
@@ -20,17 +22,21 @@ export async function POST(req: NextRequest) {
     const session = await getSession();
     const body = await req.json();
 
-    const providerId = session?.role === 'service_provider' ? session.userId : (body.provider_id || 'de0b6989-bf7e-4d6e-b127-397af924a75b');
-    const providerName = session?.role === 'service_provider' ? session.fullName : (body.provider_name || 'Service Provider');
-    const providerEmail = session?.role === 'service_provider' ? session.email : (body.provider_email || 'provider@example.com');
+    const providerEmail = body.provider_email?.trim() || (session?.role === 'service_provider' ? session.email : 'provider@example.com');
+    const providerName = body.provider_name?.trim() || ((session && session.email.toLowerCase() === providerEmail.toLowerCase()) ? session.fullName : 'Service Provider');
+    const providerId = (session?.email && session.email.toLowerCase() === providerEmail.toLowerCase())
+      ? session.userId
+      : (body.provider_id || `usr_prov_${Date.now()}`);
 
-    const clientId = session?.role === 'client' ? session.userId : (body.client_id || 'fe62449c-8908-479f-9302-470005140e70');
-    const clientName = session?.role === 'client' ? session.fullName : (body.client_name || 'Client Representative');
-    const clientEmail = session?.role === 'client' ? session.email : (body.client_email || 'client@example.com');
+    const clientEmail = body.client_email?.trim() || (session?.role === 'client' ? session.email : 'client@example.com');
+    const clientName = body.client_name?.trim() || ((session && session.email.toLowerCase() === clientEmail.toLowerCase()) ? session.fullName : 'Client Representative');
+    const clientId = (session?.email && session.email.toLowerCase() === clientEmail.toLowerCase())
+      ? session.userId
+      : (body.client_id || `usr_client_${Date.now()}`);
 
     const newProject: Partial<Project> = {
-      title: body.title || 'Untitled Project',
-      description: body.description || '',
+      title: body.title?.trim() || 'Untitled Project',
+      description: body.description?.trim() || '',
       client_id: clientId,
       client_name: clientName,
       client_email: clientEmail,

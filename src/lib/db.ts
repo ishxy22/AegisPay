@@ -68,6 +68,18 @@ class LocalDataStore {
 const globalStore = (global as unknown as { __aegispay_store?: LocalDataStore }).__aegispay_store || new LocalDataStore();
 (global as unknown as { __aegispay_store?: LocalDataStore }).__aegispay_store = globalStore;
 
+function hydrateMilestone(m: any): Milestone {
+  if (!m) return m;
+  if (!m.assignee_email && Array.isArray(m.deliverables)) {
+    const match = m.deliverables.find((d: any) => typeof d === 'string' && d.startsWith('Assignee: '));
+    if (match) {
+      const emailMatch = match.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      if (emailMatch) m.assignee_email = emailMatch[1];
+    }
+  }
+  return m as Milestone;
+}
+
 // ------------------------------------------------------------------------------
 // DATABASE ACCESS METHODS WITH REAL POSTGRESQL PERSISTENCE
 // ------------------------------------------------------------------------------
@@ -198,7 +210,7 @@ export const db = {
         .eq('project_id', projectId)
         .order('created_at', { ascending: true });
 
-      if (!error && data && data.length > 0) return data as Milestone[];
+      if (!error && data && data.length > 0) return data.map(hydrateMilestone);
       if (error) console.error('[DB] getMilestonesByProject error:', error.message);
 
       // If projectId is 'proj_web_dev_3000' and database uses UUID, resolve to first project's milestones
@@ -210,16 +222,16 @@ export const db = {
             .select('*')
             .eq('project_id', firstProj.id)
             .order('created_at', { ascending: true });
-          if (mData && mData.length > 0) return mData as Milestone[];
+          if (mData && mData.length > 0) return mData.map(hydrateMilestone);
         }
       }
     }
 
     const list = globalStore.milestones.filter((m) => m.project_id === projectId);
-    if (list.length > 0) return list;
+    if (list.length > 0) return list.map(hydrateMilestone);
 
     if (projectId === 'proj_web_dev_3000' && globalStore.milestones.length > 0) {
-      return globalStore.milestones;
+      return globalStore.milestones.map(hydrateMilestone);
     }
     return [];
   },
@@ -232,35 +244,44 @@ export const db = {
         .eq('id', id)
         .maybeSingle();
 
-      if (!error && data) return data as Milestone;
+      if (!error && data) return hydrateMilestone(data);
     }
-    return globalStore.milestones.find((m) => m.id === id) || null;
+    const found = globalStore.milestones.find((m) => m.id === id);
+    return found ? hydrateMilestone(found) : null;
   },
 
   async createMilestones(milestones: Partial<Milestone>[]): Promise<Milestone[]> {
-    const formatted: Milestone[] = milestones.map((m) => ({
-      id: m.id && m.id.includes('-') ? m.id : crypto.randomUUID(),
-      project_id: m.project_id!,
-      title: m.title || 'Untitled Milestone',
-      description: m.description || '',
-      deliverables: m.deliverables || [],
-      acceptance_criteria: m.acceptance_criteria || [],
-      expected_completion_date: m.expected_completion_date || new Date(Date.now() + 14 * 86400000).toISOString(),
-      allocated_amount: Number(m.allocated_amount) || 500,
-      percentage_of_budget: Number(m.percentage_of_budget) || 25,
-      dependencies: m.dependencies || [],
-      verification_requirements: m.verification_requirements || [],
-      status: m.status || 'draft',
-      paypal_order_id: m.paypal_order_id,
-      paypal_capture_id: m.paypal_capture_id,
-      paypal_invoice_id: m.paypal_invoice_id,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }));
+    const formatted: Milestone[] = milestones.map((m) => {
+      let deliverables = m.deliverables || [];
+      if (m.assignee_email && !deliverables.some((d: string) => d.startsWith('Assignee: '))) {
+        deliverables = [`Assignee: ${m.assignee_email}${m.assignee_name ? ` (${m.assignee_name})` : ''}`, ...deliverables];
+      }
+      return {
+        id: m.id && m.id.includes('-') ? m.id : crypto.randomUUID(),
+        project_id: m.project_id!,
+        title: m.title || 'Untitled Milestone',
+        description: m.description || '',
+        deliverables,
+        acceptance_criteria: m.acceptance_criteria || [],
+        expected_completion_date: m.expected_completion_date || new Date(Date.now() + 14 * 86400000).toISOString(),
+        allocated_amount: Number(m.allocated_amount) || 500,
+        percentage_of_budget: Number(m.percentage_of_budget) || 25,
+        dependencies: m.dependencies || [],
+        verification_requirements: m.verification_requirements || [],
+        status: m.status || 'draft',
+        assignee_email: m.assignee_email,
+        assignee_name: m.assignee_name,
+        paypal_order_id: m.paypal_order_id,
+        paypal_capture_id: m.paypal_capture_id,
+        paypal_invoice_id: m.paypal_invoice_id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+    });
 
     if (supabase) {
-      // Acceptance criteria is normalized in its own table in PostgreSQL
-      const dbMilestones = formatted.map(({ acceptance_criteria, ...rest }) => rest);
+      // Acceptance criteria and transient fields are sanitized for PostgreSQL schema safety
+      const dbMilestones = formatted.map(({ acceptance_criteria, assignee_email, assignee_name, ...rest }) => rest);
       const { data, error } = await supabase.from('milestones').insert(dbMilestones).select();
       if (!error && data) {
         // Persist acceptance criteria in acceptance_criteria table

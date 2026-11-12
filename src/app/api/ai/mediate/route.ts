@@ -84,14 +84,20 @@ export async function POST(req: NextRequest) {
           updates.paypal_refund_id = refundRes.id;
 
           // Record financial refund transaction
+          const parentProject = await db.getProjectById(proposal.project_id);
+          const clientId = parentProject?.client_id || 'usr_client';
+          const clientName = parentProject?.client_name || 'Client Buyer';
+          const providerId = parentProject?.provider_id || 'usr_provider';
+          const providerName = parentProject?.provider_name || 'Service Provider';
+
           await db.createTransaction({
             id: `tx_ref_${Date.now()}`,
             project_id: proposal.project_id,
             milestone_id: proposal.milestone_id,
-            client_id: 'usr_client_novatech',
-            client_name: 'NovaTech Enterprises',
-            provider_id: 'usr_dev_actenx',
-            provider_name: 'ActenX Solutions',
+            client_id: clientId,
+            client_name: clientName,
+            provider_id: providerId,
+            provider_name: providerName,
             amount: proposal.proposed_refund_amount,
             currency: proposal.currency,
             type: 'refund',

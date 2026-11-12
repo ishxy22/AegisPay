@@ -41,6 +41,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       dependencies: m.dependencies || [],
       verification_requirements: m.verification_requirements || [],
       status: m.status || 'draft',
+      assignee_email: m.assignee_email || undefined,
+      assignee_name: m.assignee_name || undefined,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }));

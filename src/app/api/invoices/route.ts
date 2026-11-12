@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { listPayPalInvoices, createPayPalInvoice } from '@/lib/paypal';
+import { db } from '@/lib/db';
 
 export async function GET() {
   try {
@@ -15,6 +16,16 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { action, projectId, milestoneId, itemTitle, amount, currency, recipientEmail, recipientName, note } = body;
 
+    let targetEmail = recipientEmail;
+    let targetName = recipientName;
+    if ((!targetEmail || !targetName) && projectId) {
+      const project = await db.getProjectById(projectId);
+      if (project) {
+        targetEmail = targetEmail || project.client_email;
+        targetName = targetName || project.client_name;
+      }
+    }
+
     // Handle activate / send live action from PayPal Invoice Inspector Modal
     if (action === 'send' || action === 'activate') {
       const invoice = await createPayPalInvoice({
@@ -23,8 +34,8 @@ export async function POST(req: NextRequest) {
         itemTitle: itemTitle || `Milestone Fulfillment Acceptance (${milestoneId || '0003'})`,
         amount: Number(amount) || 750,
         currency: currency || 'USD',
-        recipientEmail: recipientEmail || 'finance@novatech.io',
-        recipientName: recipientName || 'NovaTech Enterprises',
+        recipientEmail: targetEmail || 'finance@novatech.io',
+        recipientName: targetName || 'NovaTech Enterprises',
         note: note || 'AegisPay live PayPal Sandbox B2B escrow invoice.',
         sendImmediately: true,
       });
@@ -42,8 +53,8 @@ export async function POST(req: NextRequest) {
       itemTitle,
       amount: Number(amount),
       currency: currency || 'USD',
-      recipientEmail: recipientEmail || 'finance@novatech.io',
-      recipientName: recipientName || 'NovaTech Enterprises',
+      recipientEmail: targetEmail || 'finance@novatech.io',
+      recipientName: targetName || 'NovaTech Enterprises',
       note,
       sendImmediately: true,
     });

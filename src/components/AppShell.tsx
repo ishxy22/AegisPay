@@ -26,26 +26,32 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen bg-background text-foreground flex flex-col">
         {/* Dedicated Auth Header */}
-        <header className="w-full border-b border-border/80 bg-background/80 backdrop-blur-md">
+        <header className="w-full border-b border-border/80 bg-card/90 backdrop-blur-md sticky top-0 z-50 shadow-xs">
           <div className="max-w-5xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6">
             <Link href="/" className="flex items-center gap-2.5 group">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm group-hover:scale-105 transition-transform">
                 <ShieldCheck className="h-5 w-5" />
               </div>
-              <div>
+              <div className="flex items-center gap-2">
                 <span className="font-bold text-base tracking-tight text-foreground">AegisPay</span>
-                <span className="hidden sm:inline-block ml-2 text-[10px] font-mono font-bold uppercase px-1.5 py-0.2 rounded bg-primary/10 text-primary">
+                <span className="text-[10px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
                   ESCROW
                 </span>
               </div>
             </Link>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <Link
+                href="/demo"
+                className="hidden sm:inline-flex items-center text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Live Demo Runner
+              </Link>
               <Link
                 href="/"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-muted text-foreground transition-all shadow-xs"
               >
-                <ArrowLeft className="h-3.5 w-3.5" />
+                <ArrowLeft className="h-3.5 w-3.5 text-primary" />
                 <span>Back to Home</span>
               </Link>
             </div>

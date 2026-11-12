@@ -3,21 +3,25 @@
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ShieldCheck, Loader2, AlertCircle, UserCheck, Sparkles } from 'lucide-react';
+import { ShieldCheck, Loader2, AlertCircle, UserCheck, Sparkles, ArrowLeft } from 'lucide-react';
 
 function LoginFormInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectPath = searchParams.get('redirect') || '/dashboard';
 
-  const [email, setEmail] = useState('fuzail@actenx.com');
+  const [email, setEmail] = useState('');
   const [role, setRole] = useState<'service_provider' | 'client' | 'admin'>('service_provider');
-  const [password, setPassword] = useState('Password123!');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (!email.trim()) {
+      setError('Please enter your email address');
+      return;
+    }
     setLoading(true);
     setError(null);
 
@@ -25,7 +29,7 @@ function LoginFormInner() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, role }),
+        body: JSON.stringify({ email: email.trim(), password: password || 'Password123!', role }),
       });
 
       const data = await res.json();
@@ -50,7 +54,23 @@ function LoginFormInner() {
   };
 
   return (
-    <div className="max-w-md mx-auto py-12 space-y-6">
+    <div className="max-w-md mx-auto py-10 space-y-6">
+      <div className="flex items-center justify-between">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          <span>Back to Home Page</span>
+        </Link>
+        <Link
+          href="/register"
+          className="text-xs text-primary font-semibold hover:underline"
+        >
+          Create New Account →
+        </Link>
+      </div>
+
       <div className="text-center space-y-2">
         <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md mb-2">
           <ShieldCheck className="h-7 w-7" />
@@ -61,9 +81,12 @@ function LoginFormInner() {
 
       {/* Quick Test Logins for Reviewers */}
       <div className="p-3.5 rounded-xl border border-primary/20 bg-primary/5 space-y-2">
-        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-primary">
-          <Sparkles className="h-3.5 w-3.5" />
-          <span>Quick Benchmark Test Accounts</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-primary">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Reviewer Benchmark Quick-Fill</span>
+          </div>
+          <span className="text-[10px] text-muted-foreground font-mono">1-Click Auto-Fill</span>
         </div>
         <div className="grid grid-cols-2 gap-2 text-[11px]">
           <button
@@ -75,8 +98,8 @@ function LoginFormInner() {
                 : 'border-border bg-card hover:border-primary/50 text-foreground'
             }`}
           >
-            <div className="font-semibold">Fuzail (Provider)</div>
-            <div className="text-[10px] opacity-80">Lead Developer / Agency</div>
+            <div className="font-semibold">Developer Account</div>
+            <div className="text-[10px] opacity-80">fuzail@actenx.com</div>
           </button>
           <button
             type="button"
@@ -87,8 +110,8 @@ function LoginFormInner() {
                 : 'border-border bg-card hover:border-primary/50 text-foreground'
             }`}
           >
-            <div className="font-semibold">NovaTech (Client)</div>
-            <div className="text-[10px] opacity-80">Client Representative</div>
+            <div className="font-semibold">Client Buyer Account</div>
+            <div className="text-[10px] opacity-80">finance@novatech.io</div>
           </button>
         </div>
       </div>
@@ -108,8 +131,8 @@ function LoginFormInner() {
             onChange={(e) => setRole(e.target.value as any)}
             className="w-full p-2.5 rounded-lg border border-border bg-background text-foreground outline-none"
           >
-            <option value="service_provider">Service Provider (Developer / Agency)</option>
-            <option value="client">Client Representative (Buyer)</option>
+            <option value="service_provider">Service Provider (Developer / Agency / Contractor)</option>
+            <option value="client">Client Representative (Buyer / Employer)</option>
             <option value="admin">Platform Administrator / Arbitrator</option>
           </select>
         </div>
@@ -120,19 +143,24 @@ function LoginFormInner() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="e.g. yourname@company.com"
             required
-            className="w-full p-2.5 rounded-lg border border-border bg-background text-foreground outline-none font-mono text-xs"
+            className="w-full p-2.5 rounded-lg border border-border bg-background text-foreground outline-none font-mono text-xs placeholder:text-muted-foreground/60"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="font-semibold text-foreground">Password</label>
+          <div className="flex items-center justify-between">
+            <label className="font-semibold text-foreground">Password</label>
+            <span className="text-[10px] text-muted-foreground">Demo default: Password123!</span>
+          </div>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
             required
-            className="w-full p-2.5 rounded-lg border border-border bg-background text-foreground outline-none font-mono text-xs"
+            className="w-full p-2.5 rounded-lg border border-border bg-background text-foreground outline-none font-mono text-xs placeholder:text-muted-foreground/60"
           />
         </div>
 
@@ -145,12 +173,19 @@ function LoginFormInner() {
           <span>Sign In to AegisPay</span>
         </button>
 
-        <p className="text-center text-[11px] text-muted-foreground pt-2">
-          Don&apos;t have an account?{' '}
-          <Link href="/register" className="text-primary font-semibold hover:underline">
-            Register new account
-          </Link>
-        </p>
+        <div className="pt-3 border-t border-border/60 text-center space-y-2">
+          <p className="text-[11px] text-muted-foreground">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="text-primary font-semibold hover:underline">
+              Create an account now
+            </Link>
+          </p>
+          <div>
+            <Link href="/" className="text-[11px] text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
+              ← Return to Home Page
+            </Link>
+          </div>
+        </div>
       </form>
     </div>
   );

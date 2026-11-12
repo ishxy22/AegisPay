@@ -40,8 +40,11 @@ export async function POST(req: NextRequest) {
     });
 
     if (projectId) {
-      const clientId = session?.userId || 'fe62449c-8908-479f-9302-470005140e70';
-      const clientName = session?.fullName || 'NovaTech Enterprises';
+      const project = await db.getProjectById(projectId);
+      const clientId = project?.client_id || session?.userId || 'usr_client';
+      const clientName = project?.client_name || session?.fullName || 'Client Buyer';
+      const providerId = project?.provider_id || 'usr_provider';
+      const providerName = project?.provider_name || 'Service Provider';
 
       await db.createTransaction({
         id: crypto.randomUUID(),
@@ -49,8 +52,8 @@ export async function POST(req: NextRequest) {
         milestone_id: milestoneId,
         client_id: clientId,
         client_name: clientName,
-        provider_id: 'de0b6989-bf7e-4d6e-b127-397af924a75b',
-        provider_name: 'ActenX Solutions',
+        provider_id: providerId,
+        provider_name: providerName,
         amount: Number(refund.amount.value),
         currency: refund.amount.currency_code,
         type: 'refund',

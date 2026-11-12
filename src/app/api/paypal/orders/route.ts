@@ -47,8 +47,11 @@ export async function POST(req: NextRequest) {
       status: 'payment_requested',
     });
 
-    const clientId = session?.userId || 'fe62449c-8908-479f-9302-470005140e70';
-    const clientName = session?.fullName || 'NovaTech Enterprises';
+    const project = await db.getProjectById(milestone.project_id);
+    const clientId = project?.client_id || session?.userId || 'usr_client';
+    const clientName = project?.client_name || session?.fullName || 'Client Buyer';
+    const providerId = project?.provider_id || (milestone.assignee_email ? `usr_${milestone.assignee_email}` : 'usr_provider');
+    const providerName = project?.provider_name || milestone.assignee_name || 'Service Provider';
 
     // Record initiated transaction
     await db.createTransaction({
@@ -57,8 +60,8 @@ export async function POST(req: NextRequest) {
       milestone_id: milestone.id,
       client_id: clientId,
       client_name: clientName,
-      provider_id: 'de0b6989-bf7e-4d6e-b127-397af924a75b',
-      provider_name: 'ActenX Solutions (Fuzail & Team)',
+      provider_id: providerId,
+      provider_name: providerName,
       amount: amount || milestone.allocated_amount,
       currency: currency || 'USD',
       type: 'milestone_payment',
