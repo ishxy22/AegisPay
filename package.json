@@ -1,7 +1,8 @@
 {
   "name": "aegispay",
   "version": "0.1.0",
-  "private": true,
+  "description": "AI-Powered B2B Payment Protection & Digital Dispute Defense on PayPal",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

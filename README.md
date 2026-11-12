@@ -3,6 +3,7 @@
 > **"Every payment should have proof. Every deliverable should have protection."**
 
 [![Next.js 15](https://img.shields.io/badge/Next.js-15.5-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PayPal Sandbox](https://img.shields.io/badge/PayPal-REST%20v2-003087?style=flat&logo=paypal)](https://developer.paypal.com/)
 [![Gemini 2.5 Flash](https://img.shields.io/badge/Google-Gemini%202.5%20Flash-4285F4?style=flat&logo=google)](https://ai.google.dev/)
 [![Groq Llama 3](https://img.shields.io/badge/Groq-Llama%203-F55036?style=flat)](https://groq.com/)
@@ -170,3 +171,9 @@ AegisPay adheres to strict truthfulness standards:
 - **No Fictitious Claims:** Dispute cases are tracked as *"Evidence Submitted / Awaiting Adjudication"*. AegisPay never marks a dispute as won until verified confirmation is returned by the PayPal Customer Disputes API.
 - **Forensic Records:** Dossiers contain raw commit SHAs, RFC 3339 timestamps, and verifiable HTTP server response codes.
 - **Data Sovereignty:** All deliverable proof receipts are anchored in PostgreSQL with strict Row Level Security (RLS).
+
+---
+
+## 📄 Open Source License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for complete details. Free for commercial, personal, and research use.
